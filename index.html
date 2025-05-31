@@ -237,7 +237,7 @@
                 fill(red(this.colour), green(this.colour), blue(this.colour), alpha);
                 
                 // Draw Offset Triangles instead of square 
-                this.drawRoundedRectdrawOffsetTriangles(this.x, this.y, this.radius);
+                this.drawOffsetTriangles(this.x, this.y, this.radius, alpha);
                 
                 // Update position
                 this.x += this.velX;
@@ -258,7 +258,7 @@
             }
             
             // Method to draw a Offset Triangles - simpler approach
-            drawOffsetTriangles(x, y, radius) {
+            drawOffsetTriangles(x, y, radius, alpha) {
                 // First triangle
                 triangle(
                     x, y - radius,               // top point
