@@ -231,13 +231,13 @@
             }
             
             draw() {
-                // Draw the rounded rectangle
+                // Draw Offset Triangles
                 noStroke();
                 const alpha = map(this.age, 0, this.lifetime, 255, 0);
                 fill(red(this.colour), green(this.colour), blue(this.colour), alpha);
                 
-                // Draw rounded rectangle instead of square 
-                this.drawRoundedRect(this.x, this.y, this.radius);
+                // Draw Offset Triangles instead of square 
+                this.drawRoundedRectdrawOffsetTriangles(this.x, this.y, this.radius);
                 
                 // Update position
                 this.x += this.velX;
@@ -257,10 +257,23 @@
                 this.age++;
             }
             
-            // Method to draw a rounded rectangle - simpler approach
-            drawRoundedRect(x, y, radius) {
-                rectMode(CENTER);
-                rect(x, y, radius * 2, radius * 2, radius / 4);
+            // Method to draw a Offset Triangles - simpler approach
+            drawOffsetTriangles(x, y, radius) {
+                // First triangle
+                triangle(
+                    x, y - radius,               // top point
+                    x - radius, y + radius,      // bottom left
+                    x + radius, y + radius       // bottom right
+                );
+
+                // Second offset triangle (slightly shifted)
+                const offset = radius * 0.5;     // adjust this value to control the offset amount
+                fill(red(this.colour), green(this.colour), blue(this.colour), alpha * 0.7); // slightly more transparent
+                triangle(
+                    x + offset, y - radius + offset,      // top point (offset)
+                    x - radius + offset, y + radius + offset,  // bottom left (offset)
+                    x + radius + offset, y + radius + offset   // bottom right (offset)
+                );
             }
             
             isFinished() {
