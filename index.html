@@ -161,7 +161,7 @@
         
         #resultsOverlay {
             display: none;
-            padding-bottom: 80px;
+            padding-bottom: 90px; /* Increased from 80px */
         }
         
         .ultra-compact-quiz {
@@ -271,12 +271,12 @@
         .results-container {
             width: 100%;
             max-width: 400px;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
         
         .dimension-container {
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
             border-bottom: 1px solid #eee;
         }
         
@@ -317,14 +317,14 @@
         .stats-container {
             background-color: rgba(255, 255, 255, 0.5);
             border-radius: 8px;
-            padding: 10px;
+            padding: 6px 8px; /* Less top/bottom padding */
             margin-top: 12px;
         }
         
         .stat-item {
-            margin-bottom: 6px;
-            font-size: 11px;
-            line-height: 1.3;
+            margin-bottom: 4px;
+            font-size: 10px;
+            line-height: 1.2;
         }
     </style>
 </head>
@@ -1048,9 +1048,9 @@
             }
             
             // Add uncanny valley insight
-            if (feedback.uncannyValue > 7) {
+            if (feedback.uncannyValue > 8) {
                 summaryText += " The high uncanny rating suggests you're experiencing the 'uncanny valley' effect in this interaction.";
-            } else if (feedback.uncannyValue < 4) {
+            } else if (feedback.uncannyValue < 3) {
                 summaryText += " Your low uncanny rating suggests this interaction feels relatively natural to you.";
             }
             
