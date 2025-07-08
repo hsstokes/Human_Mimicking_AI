@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tactile Thresholds</title>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
@@ -19,7 +19,7 @@
         }
         
         #p5-container {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -38,7 +38,7 @@
         
         /* Overlays */
         .overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -54,7 +54,7 @@
         }
         
         #startOverlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -67,19 +67,19 @@
             z-index: 1000;
         }
         
-        #startTitle {
+        .title {
             font-size: 24px;
-            margin-bottom: 20px;
+            margin: 8px 0;
             color: #333;
             text-align: center;
             letter-spacing: 1px;
         }
         
-        #startDescription {
+        .description {
             max-width: 500px;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 40px;
+            font-size: 14px;
+            line-height: 1.3;
+            margin-bottom: 12px;
             text-align: center;
             color: #555;
             padding: 0 20px;
@@ -112,7 +112,7 @@
         }
         
         #soundButton {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
@@ -140,7 +140,7 @@
         
         /* Interaction counter */
         #interactionCounter {
-            position: absolute;
+            position: fixed;
             top: 15px;
             left: 15px;
             background-color: rgba(255, 255, 255, 0.7);
@@ -333,8 +333,8 @@
     
     <!-- Start Screen -->
     <div id="startOverlay">
-        <div id="startTitle">Tactile Thresholds</div>
-        <div id="startDescription">
+        <div class="title">Tactile Thresholds</div>
+        <div class="description">
             "Human Mimicking AI": Explore the intersection of physical and digital through touch. 
             Each interaction generates unique sound compositions that map the 
             emotional relationships between human and AI.
@@ -406,8 +406,8 @@
     
     <!-- Results Overlay -->
     <div id="resultsOverlay" class="overlay">
-        <div class="title" style="font-size: 18px; margin: 8px 0; text-align: center;">Dimensional Empathy Analysis</div>
-        <div class="description" style="max-width: 500px; font-size: 12px; line-height: 1.3; margin-bottom: 12px; text-align: center;">
+        <div class="title">Dimensional Empathy Analysis</div>
+        <div class="description">
             How your perceptions compare with the theoretical self-model of a human-mimicking AI system:
         </div>
         
