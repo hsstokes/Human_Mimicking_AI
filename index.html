@@ -2,33 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tactile Thresholds</title>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
         
         body {
             margin: 0;
             padding: 0;
-            overflow: auto;
+            overflow: hidden;
+            touch-action: none;
             background-color: #f5f5f7;
             font-family: 'Roboto Mono', monospace;
-            -webkit-text-size-adjust: 100%;
-            position: relative;
-            min-height: 100vh;
-            font-size: 14px;
         }
         
         #p5-container {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10;
-            touch-action: none;
+            overflow: hidden;
+            cursor: pointer;
         }
         
         canvas {
@@ -41,7 +38,7 @@
         
         /* Overlays */
         .overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -49,74 +46,56 @@
             background-color: rgba(245, 245, 247, 0.95);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             z-index: 1000;
-            box-sizing: border-box;
-            padding: 10px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
         
         #startOverlay {
-            position: fixed;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
+            background-color: rgba(245, 245, 247, 0.9);
+            display: flex;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
         
-        #feedbackOverlay {
-            display: none;
-            position: fixed;
-            height: 100%;
-            justify-content: flex-start;
-            padding-top: 15px;
-            padding-bottom: 60px; /* Make room for fixed button */
-        }
-        
-        #resultsOverlay {
-            display: none;
-            padding-bottom: 80px; /* Increased from 60px */
-            overflow-y: auto;
-            touch-action: auto;
-            position: fixed;
-        }
-        
-        /* Titles and text */
-        .title {
-            font-size: 18px;
-            margin: 8px 0;
+        #startTitle {
+            font-size: 24px;
+            margin-bottom: 20px;
             color: #333;
             text-align: center;
             letter-spacing: 1px;
         }
         
-        .description {
+        #startDescription {
             max-width: 500px;
-            font-size: 12px;
-            line-height: 1.3;
-            margin-bottom: 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 40px;
             text-align: center;
             color: #555;
-            padding: 0 10px;
+            padding: 0 20px;
         }
         
-        /* Buttons */
         .button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 12px 30px;
+            font-size: 18px;
             background-color: transparent;
             color: #0066cc;
             border: 1px solid #0066cc;
-            border-radius: 20px;
+            border-radius: 30px;
             cursor: pointer;
             font-family: 'Roboto Mono', monospace;
             transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            touch-action: manipulation;
-            margin: 8px 0;
-            min-height: 40px;
-            min-width: 40px;
+            letter-spacing: 1px;
         }
         
         .button:hover {
@@ -125,7 +104,6 @@
         
         .button:active {
             transform: scale(0.98);
-            background-color: rgba(0, 102, 204, 0.2);
         }
         
         .button.primary {
@@ -133,14 +111,13 @@
             color: white;
         }
         
-        /* Sound Button with Image */
         #soundButton {
-            position: fixed;
-            bottom: 15px;
+            position: absolute;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             background-color: transparent;
             border: none;
             border-radius: 0;
@@ -149,8 +126,6 @@
             align-items: center;
             z-index: 100;
             cursor: pointer;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            touch-action: manipulation;
         }
         
         #soundButton img {
@@ -163,31 +138,9 @@
             transform: translateX(-50%) scale(0.95);
         }
         
-        /* Fallback for when image is not available */
-        #interactButton {
-            position: fixed;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background-color: rgba(0, 102, 204, 0.2);
-            border: 2px solid #0066cc;
-            border-radius: 50%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            cursor: pointer;
-        }
-        
-        #interactButton:active {
-            transform: translateX(-50%) scale(0.95);
-            background-color: rgba(0, 102, 204, 0.4);
-        }
-        
+        /* Interaction counter */
         #interactionCounter {
-            position: fixed;
+            position: absolute;
             top: 15px;
             left: 15px;
             background-color: rgba(255, 255, 255, 0.7);
@@ -198,48 +151,58 @@
             z-index: 100;
         }
         
-        /* Ultra-compact quiz styling */
+        /* Quiz styling */
+        #feedbackOverlay {
+            display: none;
+            justify-content: flex-start;
+            padding-top: 20px;
+            padding-bottom: 80px;
+        }
+        
+        #resultsOverlay {
+            display: none;
+            padding-bottom: 80px;
+        }
+        
         .ultra-compact-quiz {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 0 10px;
-            margin-top: 0;
+            margin-top: 20px;
         }
-
+        
         .feedback-form {
             width: 100%;
             max-width: 400px;
             padding: 0;
             margin: 0;
         }
-
-        /* Super compact questions */
+        
         .question {
             width: 100%;
-            margin-bottom: 6px;
-            padding-bottom: 6px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
-
+        
         .question-text {
             font-size: 14px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
             text-align: center;
         }
-
-        /* Tighter buttons */
+        
         .options-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
+            gap: 8px;
             width: 100%;
         }
-
+        
         .option-button {
-            padding: 6px 4px;
+            padding: 8px 6px;
             background-color: transparent;
             color: #333;
             border: 1px solid #ccc;
@@ -247,30 +210,24 @@
             cursor: pointer;
             font-family: 'Roboto Mono', monospace;
             transition: all 0.2s ease;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            touch-action: manipulation;
             font-size: 12px;
             text-align: center;
-            min-height: 32px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            min-height: 36px;
         }
-
+        
         .option-button.selected {
             background-color: #0066cc;
             color: white;
             border-color: #0066cc;
         }
-
-        /* Minimal slider */
+        
         .mini-slider-container {
             display: flex;
             align-items: center;
             width: 100%;
-            margin: 0;
+            margin: 10px 0;
         }
-
+        
         .mini-slider {
             flex: 1;
             -webkit-appearance: none;
@@ -280,7 +237,7 @@
             outline: none;
             margin: 0 8px;
         }
-
+        
         .mini-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -290,13 +247,13 @@
             background: #0066cc;
             cursor: pointer;
         }
-
+        
         .slider-label-small {
             font-size: 10px;
             color: #666;
         }
-
-        /* Fixed submit container at the absolute bottom */
+        
+        /* Fixed submit container */
         .fixed-submit-container {
             position: fixed;
             bottom: 0;
@@ -314,7 +271,7 @@
         .results-container {
             width: 100%;
             max-width: 400px;
-            padding-bottom: 20px; /* Reduced from 40px */
+            padding-bottom: 20px;
         }
         
         .dimension-container {
@@ -366,103 +323,34 @@
         
         .stat-item {
             margin-bottom: 6px;
-            font-size: 11px;/* Smaller stats */
+            font-size: 11px;
             line-height: 1.3;
-        }
-        /* Smaller buttons in results view */
-        #resultsOverlay .button {
-           padding: 8px 16px;
-           font-size: 14px;
-           min-height: 36px;
-           margin: 5px 0;
-        }
-        
-        /* Help button */
-        #helpButton {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            color: #333;
-            cursor: pointer;
-            z-index: 100;
-        }
-        
-        /* Loading indicator */
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(245, 245, 247, 1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0066cc;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Loading indicator -->
-    <div id="loadingOverlay">
-        <div class="loader"></div>
-    </div>
-    
     <div id="p5-container"></div>
     
     <!-- Start Screen -->
-    <div id="startOverlay" class="overlay">
-        <div class="title">Tactile Thresholds</div>
-        <div class="description">
-            "Human-Mimicking AI": Explore the intersection of physical and digital through touch. 
-            Each interaction generates unique sound compositions that map the emotional relationships 
-            between human and AI. Fill in the quiz to compare your perceptions with the theoretical 
-            self-model of a human-mimicking AI system.
+    <div id="startOverlay">
+        <div id="startTitle">Tactile Thresholds</div>
+        <div id="startDescription">
+            "Human Mimicking AI": Explore the intersection of physical and digital through touch. 
+            Each interaction generates unique sound compositions that map the 
+            emotional relationships between human and AI.
         </div>
         <button id="startButton" class="button primary">BEGIN INTERACTION</button>
     </div>
     
-    <!-- Interaction Controls -->
+    <!-- Interaction button -->
     <div id="soundButton">
         <img src="images/your-button-image.png" alt="Sound Button">
     </div>
     
-    <!-- Fallback interaction button (only shown if image doesn't load) -->
-    <div id="interactButton">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5V19M16 5V19M5 8H19M5 16H19" stroke="#0066cc" stroke-width="2" stroke-linecap="round" />
-        </svg>
-    </div>
-    
     <div id="interactionCounter">Interactions: 0/5</div>
-    <div id="helpButton">?</div>
     
     <!-- Feedback Overlay -->
     <div id="feedbackOverlay" class="overlay">
-        <!-- Removed title to save space -->
-        
         <div class="ultra-compact-quiz">
             <form id="feedbackForm" class="feedback-form">
                 <!-- Question 1: Dimensional Axis -->
@@ -487,7 +375,7 @@
                     </div>
                 </div>
                 
-                <!-- Question 3: Uncanny Valley Rating - Simplified even further -->
+                <!-- Question 3: Uncanny Valley Rating -->
                 <div class="question">
                     <div class="question-text">How "uncanny" did this interaction feel? <span id="sliderValue">5</span>/10</div>
                     <div class="mini-slider-container">
@@ -518,8 +406,8 @@
     
     <!-- Results Overlay -->
     <div id="resultsOverlay" class="overlay">
-        <div class="title">Dimensional Empathy Analysis</div>
-        <div class="description">
+        <div class="title" style="font-size: 18px; margin: 8px 0; text-align: center;">Dimensional Empathy Analysis</div>
+        <div class="description" style="max-width: 500px; font-size: 12px; line-height: 1.3; margin-bottom: 12px; text-align: center;">
             How your perceptions compare with the theoretical self-model of a human-mimicking AI system:
         </div>
         
@@ -580,7 +468,7 @@
                 <div class="stat-item" id="uncannyScore">Your Uncanny Rating: 5/10</div>
                 <div class="stat-item" id="emotionalResponse">Your Emotional Response: --</div>
                 <div class="stat-item" id="dimensionalGap">Dimensional Gap: 40%</div>
-                <div class="stat-item" id="interpretationSummary">This suggests a moderate difference between your perception and this AI's mimicry.</div>
+                <div class="stat-item" id="interpretationSummary">This suggests a moderate difference between your perception and this AI's attempt to mimic human behavior.</div>
             </div>
         </div>
         
@@ -591,29 +479,6 @@
                 <button id="restartButton" class="button primary">Restart</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Help Overlay -->
-    <div id="helpOverlay" class="overlay">
-        <div class="title">The Dimensional Empathy Framework</div>
-        <div class="description">
-            Understanding where the "uncanny valley" emerges in AI interactions.
-        </div>
-        
-        <img class="framework-diagram" src="https://placehold.co/600x400?text=Empathy+Framework+Diagram" alt="Empathy Framework Diagram">
-        
-        <div style="max-width: 400px; text-align: left; margin: 0 auto 20px auto;">
-            <h3 style="font-size: 16px;">Key Dimensions:</h3>
-            <p style="font-size: 12px;"><strong>Analytical vs Embodied</strong>: Data-driven calculation vs. physical/emotional presence.</p>
-            <p style="font-size: 12px;"><strong>Temporal vs Atemporal</strong>: Connected to time flow vs. outside time constraints.</p>
-            <p style="font-size: 12px;"><strong>Contextual vs Decontextualized</strong>: Grounded in context vs. context-free.</p>
-            <p style="font-size: 12px;"><strong>Intuitive vs Computational</strong>: Natural/effortless vs. calculated/algorithmic.</p>
-            
-            <h3 style="font-size: 16px;">The Uncanny Valley:</h3>
-            <p style="font-size: 12px;">The "uncanny valley" occurs when AI interaction is close to human-like but not quite there--creating a sense of unease or discomfort.</p>
-        </div>
-        
-        <button id="closeHelp" class="button primary">Return to Experience</button>
     </div>
     
     <script>
@@ -628,8 +493,6 @@
         let soundsLoaded = false;
         let soundInitialized = false;
         let soldier;
-        let assetsLoaded = 0;
-        let totalAssets = 13; // 6 right + 6 left images + 1 grid
         
         // Canvas dimensions
         let W_WIDTH = 1920;
@@ -642,12 +505,12 @@
         // Feedback data
         let feedbackData = [];
         
-        // AI Empathy Framework dimensions - human-mimicking AI preset
+        // AI Empathy Framework dimensions - human-mimicking AI preset (more embodied and intuitive)
         const aiFramework = {
             analytical: 0.40,  // More embodied (higher value) for human mimicking
             temporal: 0.60,    // More atemporal for human mimicking
             contextual: 0.45,  // More balanced for human mimicking
-            intuitive: 0.70    // More computational for human mimicking
+            intuitive: 0.70    // More intuitive for human mimicking
         };
         
         // Human perception (will be populated from feedback)
@@ -791,31 +654,20 @@
             }
         }
         
-        // Function to increment asset loading counter
-        function assetLoaded() {
-            assetsLoaded++;
-            if (assetsLoaded >= totalAssets) {
-                // Hide loading overlay when all assets are loaded
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-        
         // Preload assets
         function preload() {
-            // Load background with callback
-            gridImg = loadImage('images/grid_img.jpeg', assetLoaded);
+            // Load background
+            gridImg = loadImage('images/grid_img.jpeg');
             
-            // Load character images with callbacks
+            // Load character images
             for (let i = 1; i <= 6; i++) {
-                walkRight.push(loadImage(`soldier/${i}.png`, assetLoaded));
-                walkLeft.push(loadImage(`soldier/L${i}.png`, assetLoaded));
+                walkRight.push(loadImage(`soldier/${i}.png`));
+                walkLeft.push(loadImage(`soldier/L${i}.png`));
             }
             
             // Sound loading
             soundFormats('mp3');
-            bulletSound = loadSound('sounds/Bulletsound.mp3', function() {
-                soundsLoaded = true;
-            });
+            bulletSound = loadSound('sounds/Bulletsound.mp3');
         }
         
         function setup() {
@@ -845,8 +697,8 @@
                 return false;
             });
             
-            // Create character  
-            soldier = new Player(width/2 - 245, height/2 - 245, 490, 490);
+            // Create character with LARGER size (250x250)
+            soldier = new Player(width/2 - 200, height/2 - 200, 400, 400);
             
             // Set up UI event listeners
             setupEventListeners();
@@ -856,67 +708,22 @@
             // Create AudioContext
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
             window.audioContext = new AudioContext();
-            
-            // Show loading overlay if assets are still loading
-            if (assetsLoaded < totalAssets) {
-                document.getElementById('loadingOverlay').style.display = 'flex';
-            } else {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-            
-            // Check if the image button exists and works
-            checkImageButton();
-        }
-        
-        // Check if sound button image exists and show/hide appropriate button
-        function checkImageButton() {
-            const soundButton = document.getElementById('soundButton');
-            const interactButton = document.getElementById('interactButton');
-            const img = soundButton.querySelector('img');
-            
-            // Check if the image exists or loads properly
-            if (img) {
-                img.onerror = function() {
-                    // Image failed to load, show the fallback button
-                    soundButton.style.display = 'none';
-                    interactButton.style.display = 'flex';
-                };
-                
-                img.onload = function() {
-                    // Image loaded successfully, use the image button
-                    soundButton.style.display = 'flex';
-                    interactButton.style.display = 'none';
-                };
-            }
         }
         
         function setupEventListeners() {
-            // Remove any existing event listeners to prevent duplicates
-            clearEventListeners();
-            
             // Start button
-            const startButton = document.getElementById('startButton');
-            startButton.addEventListener('click', handleStartClick);
-            startButton.addEventListener('touchstart', handleStartTouch);
+            document.getElementById('startButton').addEventListener('click', startGame);
+            document.getElementById('startButton').addEventListener('touchstart', function(e) {
+                startGame();
+                e.preventDefault();
+            });
             
-            // Sound button with image
-            const soundButton = document.getElementById('soundButton');
-            soundButton.addEventListener('click', handleInteractClick);
-            soundButton.addEventListener('touchstart', handleInteractTouch);
-            
-            // Fallback interaction button
-            const interactButton = document.getElementById('interactButton');
-            interactButton.addEventListener('click', handleInteractClick);
-            interactButton.addEventListener('touchstart', handleInteractTouch);
-            
-            // Help button
-            const helpButton = document.getElementById('helpButton');
-            helpButton.addEventListener('click', showHelp);
-            helpButton.addEventListener('touchstart', handleHelpTouch);
-            
-            const closeHelp = document.getElementById('closeHelp');
-            closeHelp.addEventListener('click', hideHelp);
-            closeHelp.addEventListener('touchstart', handleCloseHelpTouch);
+            // Sound button
+            document.getElementById('soundButton').addEventListener('click', createInteraction);
+            document.getElementById('soundButton').addEventListener('touchstart', function(e) {
+                createInteraction();
+                e.preventDefault();
+            });
             
             // Set up option buttons
             setupOptionButtons();
@@ -924,7 +731,10 @@
             // Submit feedback button
             const submitButton = document.getElementById('submitFeedback');
             submitButton.addEventListener('click', submitFeedback);
-            submitButton.addEventListener('touchstart', handleSubmitTouch);
+            submitButton.addEventListener('touchstart', function(e) {
+                submitFeedback();
+                e.preventDefault();
+            });
             
             // Add slider value display update
             const uncannySlider = document.getElementById('uncannySlider');
@@ -937,162 +747,36 @@
             // Results screen buttons
             const continueButton = document.getElementById('continueButton');
             continueButton.addEventListener('click', continueFeedback);
-            continueButton.addEventListener('touchstart', handleContinueTouch);
+            continueButton.addEventListener('touchstart', function(e) {
+                continueFeedback();
+                e.preventDefault();
+            });
             
             const restartButton = document.getElementById('restartButton');
             restartButton.addEventListener('click', restartExperience);
-            restartButton.addEventListener('touchstart', handleRestartTouch);
-            
-            // Prevent default form submission
-            const feedbackForm = document.getElementById('feedbackForm');
-            feedbackForm.addEventListener('submit', function(e) {
+            restartButton.addEventListener('touchstart', function(e) {
+                restartExperience();
                 e.preventDefault();
-                return false;
             });
-            
-            // Prevent context menu on long press
-            document.addEventListener('contextmenu', function(e) {
-                if (gameStarted) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-            
-            // Only disable touch actions on game container, not the whole document
-            document.getElementById('p5-container').addEventListener('touchmove', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-            
-            // Allow touch scrolling on overlays
-            document.querySelectorAll('.overlay').forEach(overlay => {
-                overlay.addEventListener('touchmove', function(e) {
-                    e.stopPropagation(); // Don't let it bubble to the p5-container
-                }, { passive: true });
-            });
-        }
-        
-        function clearEventListeners() {
-            // Helper function to remove and re-add event listeners
-            const removeListeners = (element, handlers) => {
-                if (!element) return;
-                for (const [event, handler] of Object.entries(handlers)) {
-                    element.removeEventListener(event, handler);
-                }
-            };
-            
-            // Clear specific elements that we're reattaching listeners to
-            removeListeners(document.getElementById('startButton'), {
-                'click': handleStartClick,
-                'touchstart': handleStartTouch
-            });
-            
-            removeListeners(document.getElementById('soundButton'), {
-                'click': handleInteractClick,
-                'touchstart': handleInteractTouch
-            });
-            
-            removeListeners(document.getElementById('interactButton'), {
-                'click': handleInteractClick,
-                'touchstart': handleInteractTouch
-            });
-            
-            removeListeners(document.getElementById('helpButton'), {
-                'click': showHelp,
-                'touchstart': handleHelpTouch
-            });
-            
-            removeListeners(document.getElementById('closeHelp'), {
-                'click': hideHelp,
-                'touchstart': handleCloseHelpTouch
-            });
-            
-            removeListeners(document.getElementById('submitFeedback'), {
-                'click': submitFeedback,
-                'touchstart': handleSubmitTouch
-            });
-            
-            removeListeners(document.getElementById('continueButton'), {
-                'click': continueFeedback,
-                'touchstart': handleContinueTouch
-            });
-            
-            removeListeners(document.getElementById('restartButton'), {
-                'click': restartExperience,
-                'touchstart': handleRestartTouch
-            });
-        }
-        
-        // Touch handlers with prevent default
-        function handleStartTouch(e) {
-            e.preventDefault();
-            startExperience();
-        }
-        
-        function handleInteractTouch(e) {
-            e.preventDefault();
-            createInteraction();
-        }
-        
-        function handleHelpTouch(e) {
-            e.preventDefault();
-            showHelp();
-        }
-        
-        function handleCloseHelpTouch(e) {
-            e.preventDefault();
-            hideHelp();
-        }
-        
-        function handleSubmitTouch(e) {
-            e.preventDefault();
-            submitFeedback();
-        }
-        
-        function handleContinueTouch(e) {
-            e.preventDefault();
-            continueFeedback();
-        }
-        
-        function handleRestartTouch(e) {
-            e.preventDefault();
-            restartExperience();
-        }
-        
-        // Click handlers
-        function handleStartClick() {
-            startExperience();
-        }
-        
-        function handleInteractClick() {
-            createInteraction();
         }
         
         function setupOptionButtons() {
             // Get all option buttons
             const optionButtons = document.querySelectorAll('.option-button');
             
-            // Remove any existing listeners
-            optionButtons.forEach(button => {
-                button.removeEventListener('click', handleOptionClick);
-                button.removeEventListener('touchstart', handleOptionTouch);
-            });
-            
-            // Add new listeners
+            // Add listeners
             optionButtons.forEach(button => {
                 button.addEventListener('click', handleOptionClick);
-                button.addEventListener('touchstart', handleOptionTouch);
+                button.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selectOption(this);
+                });
             });
         }
         
-        function handleOptionClick(e) {
+        function handleOptionClick() {
             selectOption(this);
-        }
-        
-        function handleOptionTouch(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            selectOption(this);
-            return false;
         }
         
         function selectOption(button) {
@@ -1117,27 +801,12 @@
             }
         }
         
-        function startExperience() {
-            // Hide start overlay
+        function startGame() {
+            // Remove overlay
             document.getElementById('startOverlay').style.display = 'none';
             
-            // Check which button to show
-            const soundButton = document.getElementById('soundButton');
-            const interactButton = document.getElementById('interactButton');
-            const img = soundButton.querySelector('img');
-            
-            if (img && img.complete && img.naturalWidth !== 0) {
-                // Image loaded properly, show the image button
-                soundButton.style.display = 'flex';
-                interactButton.style.display = 'none';
-            } else {
-                // Image failed to load or doesn't exist, show the fallback button
-                soundButton.style.display = 'none';
-                interactButton.style.display = 'flex';
-            }
-            
+            // Show interaction counter
             document.getElementById('interactionCounter').style.display = 'block';
-            document.getElementById('helpButton').style.display = 'flex';
             
             // Update interaction counter
             updateInteractionCounter();
@@ -1153,23 +822,17 @@
             // Initialize sounds
             initSounds();
             
-            // Start the experience
+            // Show sound button
+            document.getElementById('soundButton').style.display = 'flex';
+            
+            // Start the game
             gameStarted = true;
-        }
-        
-        function showHelp() {
-            document.getElementById('helpOverlay').style.display = 'flex';
-        }
-        
-        function hideHelp() {
-            document.getElementById('helpOverlay').style.display = 'none';
         }
         
         function createInteraction() {
             // Only proceed if game is started and not in feedback mode
             if (!gameStarted || 
                 document.getElementById('feedbackOverlay').style.display === 'flex' ||
-                document.getElementById('helpOverlay').style.display === 'flex' ||
                 document.getElementById('resultsOverlay').style.display === 'flex') {
                 return;
             }
@@ -1243,9 +906,7 @@
         function showFeedbackForm() {
             // Hide interaction controls
             document.getElementById('soundButton').style.display = 'none';
-            document.getElementById('interactButton').style.display = 'none';
             document.getElementById('interactionCounter').style.display = 'none';
-            document.getElementById('helpButton').style.display = 'none';
             
             // Reset form selections
             document.querySelectorAll('.option-button.selected').forEach(btn => {
@@ -1254,12 +915,10 @@
             document.getElementById('uncannySlider').value = 5;
             document.getElementById('sliderValue').textContent = "5";
             
-            // Show feedback overlay - use flex-start alignment
-            const feedbackOverlay = document.getElementById('feedbackOverlay');
-            feedbackOverlay.style.display = 'flex';
-            feedbackOverlay.style.justifyContent = 'flex-start';
+            // Show feedback overlay
+            document.getElementById('feedbackOverlay').style.display = 'flex';
             
-            // Force scroll to top
+            // Ensure iOS scrolls to top
             setTimeout(function() {
                 window.scrollTo(0, 0);
                 document.body.scrollTop = 0;
@@ -1283,8 +942,6 @@
             // Get uncanny slider value
             const uncannySlider = document.getElementById('uncannySlider');
             const uncannyValue = uncannySlider ? parseInt(uncannySlider.value) : 5;
-    
-            console.log("Uncanny value captured:", uncannyValue); // Debug log
             
             // Validate that we have necessary inputs
             if (!primaryDimension || !secondaryDimension || !emotion) {
@@ -1378,29 +1035,28 @@
             document.getElementById('emotionalResponse').textContent = `Your Emotional Response: ${feedback.emotion}`;
             document.getElementById('dimensionalGap').textContent = `Dimensional Gap: ${gapPercentage}%`;
             
-            // Generate shorter interpretation summary specific to Human Mimicking AI
-            let summaryText = "";
+            // Generate interpretation summary specific to Human Mimicking AI
+            let summaryText = "This suggests ";
             
             if (gapPercentage > 50) {
-                summaryText = "Significant mismatch with this AI's human-mimicking design.";
+                summaryText += "a significant mismatch between your perception and this human-mimicking AI's design.";
             } else if (gapPercentage > 25) {
-                summaryText = "Moderate difference from this AI's human-mimicking approach.";
+                summaryText += "a moderate difference between your perception and this AI's attempt to mimic human behavior.";
             } else {
-                summaryText = "Your perception aligns with this AI's human-like qualities.";
+                summaryText += "your perception closely aligns with this AI's human-like characteristics.";
             }
             
-            // Add uncanny valley insight with shorter text
-            if (feedback.uncannyValue > 8) {
-                summaryText += " High uncanny valley effect detected.";
-            } else if (feedback.uncannyValue < 3) {
-                summaryText += " Interaction feels natural to you.";
+            // Add uncanny valley insight
+            if (feedback.uncannyValue > 7) {
+                summaryText += " The high uncanny rating suggests you're experiencing the 'uncanny valley' effect in this interaction.";
+            } else if (feedback.uncannyValue < 4) {
+                summaryText += " Your low uncanny rating suggests this interaction feels relatively natural to you.";
             }
             
             document.getElementById('interpretationSummary').textContent = summaryText;
             
             // Show results overlay
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            resultsOverlay.style.display = 'flex';
+            document.getElementById('resultsOverlay').style.display = 'flex';
             
             // Ensure iOS scrolls to top of results
             setTimeout(function() {
@@ -1418,21 +1074,9 @@
             interactionCount = 0;
             updateInteractionCounter();
             
-            // Show correct interaction button
-            const soundButton = document.getElementById('soundButton');
-            const interactButton = document.getElementById('interactButton');
-            const img = soundButton.querySelector('img');
-            
-            if (img && img.complete && img.naturalWidth !== 0) {
-                soundButton.style.display = 'flex';
-                interactButton.style.display = 'none';
-            } else {
-                soundButton.style.display = 'none';
-                interactButton.style.display = 'flex';
-            }
-            
+            // Show interaction controls
+            document.getElementById('soundButton').style.display = 'flex';
             document.getElementById('interactionCounter').style.display = 'block';
-            document.getElementById('helpButton').style.display = 'flex';
         }
         
         function restartExperience() {
@@ -1454,21 +1098,9 @@
             // Update interaction counter
             updateInteractionCounter();
             
-            // Show correct interaction button
-            const soundButton = document.getElementById('soundButton');
-            const interactButton = document.getElementById('interactButton');
-            const img = soundButton.querySelector('img');
-            
-            if (img && img.complete && img.naturalWidth !== 0) {
-                soundButton.style.display = 'flex';
-                interactButton.style.display = 'none';
-            } else {
-                soundButton.style.display = 'none';
-                interactButton.style.display = 'flex';
-            }
-            
+            // Show interaction controls
+            document.getElementById('soundButton').style.display = 'flex';
             document.getElementById('interactionCounter').style.display = 'block';
-            document.getElementById('helpButton').style.display = 'flex';
         }
         
         // Function to unlock audio on iOS
@@ -1565,8 +1197,7 @@
             if (keyCode === 32) { // Space key
                 if (gameStarted && shoot === 0 && 
                     document.getElementById('feedbackOverlay').style.display !== 'flex' &&
-                    document.getElementById('resultsOverlay').style.display !== 'flex' &&
-                    document.getElementById('helpOverlay').style.display !== 'flex') {
+                    document.getElementById('resultsOverlay').style.display !== 'flex') {
                     createInteraction();
                 }
                 return false;
