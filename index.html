@@ -1373,7 +1373,7 @@
             const avgDifference = (analyticDiff + temporalDiff + contextualDiff + intuitiveDiff) / 4;
             const uncannyValue = Math.round(avgDifference * 10);
 
-            / Set the value (with minimum of 1 and maximum of 10)
+            // Set the value (with minimum of 1 and maximum of 10)
             const clampedValue = Math.max(1, Math.min(10, uncannyValue));
             
             // Update stats display
